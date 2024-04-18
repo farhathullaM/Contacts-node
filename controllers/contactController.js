@@ -6,7 +6,7 @@ const Contact = require("../models/contactModel");
 //@access public
 const getAllContacts = asyncHandler(async (req, res) => {
   const contacts = Contact.find();
-  res.status(201).json({ message: "Get all contacts" });
+  res.status(201).json(contacts);
 });
 
 //@desc Create new contacts
@@ -39,21 +39,40 @@ const getContact = asyncHandler(async (req, res) => {
     throw new Error("Contact not found");
   }
 
-  res.status(201).json(contact);
+  res.status(200).json(contact);
 });
 
 //@desc Update contact
 //@route GET /api/contacts/:id
 //@access public
 const updateContact = asyncHandler(async (req, res) => {
-  res.status(201).json({ message: `Update contact on ${req.params.id}` });
+  const contact = await Contact.findById(req.params.id)
+  if(!contact){
+    res.status(404);
+    throw new Error("Contact not found")
+  }
+
+  const updatedContact = await Contact.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true}
+  );
+
+  res.status(200).json(updatedContact);
 });
 
 //@desc Delete contact
 //@route GET /api/contacts/:id
 //@access public
 const deleteContact = asyncHandler(async (req, res) => {
-  res.status(201).json({ message: `Delete contact on ${req.params.id}` });
+  const contact = await Contact.findByIdAndDelete(req.params.id)
+  if(!contact){
+    res.status(404);
+    throw new Error("Contact not found");
+  }
+
+
+  res.status(200).json(contact);
 });
 
 module.exports = {
